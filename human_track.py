@@ -2,6 +2,7 @@ from collections import defaultdict
 import signal
 import serial
 import time
+import datetime
 import cv2
 import numpy as np
 import serialcount
@@ -145,6 +146,7 @@ def main():
             #N秒毎に人数を送信する
             if timeup:
                 timeup = False
+		print(datetime.datetime.now())
                 print("Right-flow is {}".format(to_right))
                 print("Left-flow is {}".format(to_left))
                 print("Up-flow is {}".format(to_upper))
