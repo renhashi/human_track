@@ -8,7 +8,7 @@ import serialcount
 from ultralytics import YOLO
 
 # Load the YOLOv8 model
-model = YOLO("/home/orin/aeon/yolo11n.pt")
+model = YOLO("yolo11n.pt")
 
 # Open the video file
 video_path = "sample2.mp4"
