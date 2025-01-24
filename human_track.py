@@ -69,7 +69,7 @@ def main():
 
         if success:
             # Run YOLOv8 tracking on the frame, persisting tracks between frames
-            results = model.track(frame, persist=True, classes=[0])
+            results = model.track(frame, persist=True, classes=[0],verbose=False)
 
             # Visualize the results on the frame
             annotated_frame = results[0].plot()
