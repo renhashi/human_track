@@ -1,10 +1,8 @@
 from collections import defaultdict
 import signal
-#import serial
 import time
 import cv2
 import numpy as np
-import serialcount
 from ultralytics import YOLO
 
 # Load the YOLOv8 model
@@ -52,10 +50,6 @@ def main():
     stay_num_Up = 0
     reset_count_lr = 0
     reset_count_ud = 0
-
-    #serialcount.serial_open()
-    signal.signal(signal.SIGALRM, task)     #指定時間にtaskを実行する
-    signal.setitimer(signal.ITIMER_REAL, 10, INTERVAL)  #signal.setitimer(signal.ITIMER_REAL, 1回目の実行までの時間, 2回目以降の実行間隔)
 
     # Store the track history
     track_history = defaultdict(lambda: [])
@@ -142,32 +136,7 @@ def main():
                     points = np.hstack(track).astype(np.int32).reshape((-1, 1, 2))
                     cv2.polylines(annotated_frame, [points], isClosed=False, color=(230, 230, 230), thickness=10)
 
-            #N秒毎に人数を送信する
-            if timeup:
-                timeup = False
-                print("Right-flow is {}".format(to_right))
-                print("Left-flow is {}".format(to_left))
-                print("Up-flow is {}".format(to_upper))
-                print("Down-flow is {}".format(to_lower))
-
-		#kari no minus taisaku
-                if stay_num_Ri < 0 :
-                    stay_num_Ri = 0
-                    reset_count_lr += 1
-                    print("!!!!!!!!!!!1RESET STAY NUM!!!!!!!!!!1!!!")
-
-                if stay_num_Up < 0 :
-                    stay_num_Up = 0
-                    reset_count_ud += 1
-                    print("!!!!!!!!!!!1RESET STAY NUM!!!!!!!!!!1!!!")
-
-                #serialcount.serial_send(to_right, to_left, to_upper, to_lower, stay_num_Ri, stay_num_Up, reset_count_lr, reset_count_ud)
-                to_right = 0
-                to_left = 0
-                to_upper = 0
-                to_lower = 0
-
-            print("------------------------------------------------------")
+            #print("------------------------------------------------------")
 
             #ラインの描写
             cv2.line(annotated_frame,(set_linex1, 0),(set_linex1, int(height)),(255,0, 0),5)
