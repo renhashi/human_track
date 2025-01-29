@@ -7,6 +7,7 @@ import cv2
 import numpy as np
 import serialcount
 from ultralytics import YOLO
+from ultralytics.trackers import basetrack
 
 # Load the YOLOv8 model
 model = YOLO("yolo11n.pt")
@@ -20,16 +21,25 @@ serial_port = None
 SAVE_DATA = False                       #動画ファイルの出力をするかいなか
 INTERVAL = 60                           #シグナルを起動させるインターバル(秒)
 timeup = False
+ID_RESET = True
 
 #定期的にシリアル通信させるトリガー
 def task(signum, frame):
 	global timeup
 	timeup = True
 
+def reset_id(tracker, track_history):
+	tracker.reset_id()
+	track_history.clear()
+	print("ID Reset")
 		
 def main():
     global cap
     global timeup
+
+	startday = datetime.datetime.now()
+	reset_time = startday.day
+	reset_check = reset_time
 
     #フレームの幅
     width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
@@ -57,6 +67,7 @@ def main():
     serialcount.serial_open()
     signal.signal(signal.SIGALRM, task)     #指定時間にtaskを実行する
     signal.setitimer(signal.ITIMER_REAL, 10, INTERVAL)  #signal.setitimer(signal.ITIMER_REAL, 1回目の実行までの時間, 2回目以降の実行間隔)
+    tracker = basetrack.BaseTrack()
 
     # Store the track history
     track_history = defaultdict(lambda: [])
@@ -146,7 +157,9 @@ def main():
             #N秒毎に人数を送信する
             if timeup:
                 timeup = False
-		print(datetime.datetime.now())
+		now = datetime.datetime.now()
+		print(now)
+		reset_check = now.day
                 print("Right-flow is {}".format(to_right))
                 print("Left-flow is {}".format(to_left))
                 print("Up-flow is {}".format(to_upper))
@@ -168,6 +181,10 @@ def main():
                 to_left = 0
                 to_upper = 0
                 to_lower = 0
+
+            if ID_RET and reset_check != reset_time:
+                reset_id(tracker, track_history)
+                reset_time = reset_check
 
             #print("------------------------------------------------------")
 
