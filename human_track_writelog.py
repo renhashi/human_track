@@ -6,20 +6,9 @@ import cv2
 import numpy as np
 import serialcount
 from ultralytics import YOLO
-from logging import getLogger, StreamHandler, DEBUG, FileHandler, Formatter
+import setlog
 
-#LOG setting
-logger = getLogger(__name__)
-handler = StreamHandler()
-handler.setLevel(DEBUG)
-logger.setLevel(DEBUG)
-logger.addHandler(handler)
-fh = FileHandler('./system.log')
-logger.addHandler(fh)
-logger.propagate = False
-formatter = Formatter('%(asctime)s:%(lineno)d:%(levelname)s:%(message)s')
-fh.setFormatter(formatter)
-handler.setFormatter(formatter)
+logger = setlog.set_logfile()
 
 # Load the YOLOv8 model
 model = YOLO("yolo11n.pt")
