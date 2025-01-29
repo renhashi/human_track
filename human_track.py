@@ -182,7 +182,7 @@ def main():
                 to_upper = 0
                 to_lower = 0
 
-            if ID_RET and reset_check != reset_time:
+            if ID_RESET and reset_check != reset_time:
                 reset_id(tracker, track_history)
                 reset_time = reset_check
 
