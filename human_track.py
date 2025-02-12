@@ -8,9 +8,11 @@ import numpy as np
 import serialcount
 from ultralytics import YOLO
 from ultralytics.trackers import basetrack
+import setlog
 
 # Load the YOLOv8 model
 model = YOLO("yolo11n.pt")
+logger = setlog.set_logfile()
 
 # Open the video file
 video_path = "sample2.mp4"
@@ -36,10 +38,12 @@ def reset_id(tracker, track_history):
 def main():
     global cap
     global timeup
+    
+    logger.info("PROGRAM START")
 
-	startday = datetime.datetime.now()
-	reset_time = startday.day
-	reset_check = reset_time
+    startday = datetime.datetime.now()
+    reset_time = startday.day
+    reset_check = reset_time
 
     #フレームの幅
     width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
@@ -157,9 +161,9 @@ def main():
             #N秒毎に人数を送信する
             if timeup:
                 timeup = False
-		now = datetime.datetime.now()
-		print(now)
-		reset_check = now.day
+                now = datetime.datetime.now()
+                print(now)
+                reset_check = now.day
                 print("Right-flow is {}".format(to_right))
                 print("Left-flow is {}".format(to_left))
                 print("Up-flow is {}".format(to_upper))
@@ -175,8 +179,10 @@ def main():
                     stay_num_Up = 0
                     reset_count_ud += 1
                     print("!!!!!!!!!!!1RESET STAY NUM!!!!!!!!!!1!!!")
+                    
+                logger.info("Right:" + str(to_right) + ", Left:" + str(to_left) + ", Up:" + str(to_upper) + ", Down:" + str(to_lower))
 
-                serialcount.serial_send_2data(to_upper, to_lower)
+                serialcount.serial_send_4data(to_right, to_left, to_upper, to_lower)
                 to_right = 0
                 to_left = 0
                 to_upper = 0
@@ -185,6 +191,7 @@ def main():
             if ID_RESET and reset_check != reset_time:
                 reset_id(tracker, track_history)
                 reset_time = reset_check
+                logger.info("ID Reset")
 
             #print("------------------------------------------------------")
 
@@ -210,7 +217,10 @@ def main():
         else:
             # Break the loop if the end of the video is reached
             print("not opend")
-            break
+            logger.warning("do not get camera")
+            #break
+            
+    logger.info("PROGRAM END")
 
     # Release the video capture object and close the display window
     cap.release()
